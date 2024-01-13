@@ -95,48 +95,30 @@ function handleGalleryClick(event) {
 
   const largeImageSource = event.target.dataset.source;
 
-  const instance = basicLightbox.create(`
-      <img src="${largeImageSource}" width="1112" height="640">
-    `);
-
-  instance.show();
-
-  // Додавання слухача подій для клавіші Escape
-  document.addEventListener(
-    'keydown',
-    e => {
-      if (e.key === 'Escape') {
-        instance.close();
-      }
-    },
-    { once: true }
-  ); // Опція { once: true } забезпечить видалення слухача після першого використання
+  openModal(largeImageSource);
 }
 
-// =====================================================
-// function openModal(imageSource) {
-//   const modal = basicLightbox.create(`<img src="${imageSource}">`);
-//   modal.show();
+function openModal(largeImageSource) {
+  const instance = basicLightbox.create(
+    `
+  <div class="modal">
+  <img src="${largeImageSource}" width="1112" height="640"">
+  </div>
+`,
+    {
+      onShow: instance => {
+        document.addEventListener('keydown', closeModal);
+      },
+      onClose: instance => {
+        document.removeEventListener('keydown', closeModal);
+      },
+    }
+  );
 
-//   document.addEventListener('keydown', closeModalOnEscape);
+  function closeModal(e) {
+    console.log(e.code);
+    if (e.code === 'Escape') instance.close();
+  }
 
-//   function closeModalOnEscape(event) {
-//     if (event.key === 'Escape') {
-//       modal.close();
-//       document.removeEventListener('keydown', closeModalOnEscape);
-//     }
-//   }
-// }
-
-// function handleGalleryClick(event) {
-//   event.preventDefault();
-
-//   if (event.target.nodeName !== 'IMG') {
-//     return;
-//   }
-
-//   const largeImageSource = event.target.dataset.source;
-//   openModal(largeImageSource);
-// }
-
-// ;
+  instance.show();
+}
